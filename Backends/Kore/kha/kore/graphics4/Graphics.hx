@@ -154,8 +154,10 @@ class Graphics implements kha.graphics4.Graphics {
 	public function setCubeMap(unit: kha.graphics4.TextureUnit, cubeMap: kha.graphics4.CubeMap): Void {
 		if (cubeMap == null) return;
 		var koreUnit = cast(unit, kha.kore.graphics4.TextureUnit);
-		untyped __cpp__("if (cubeMap->texture != nullptr) Kore::Graphics4::setTexture(koreUnit->unit, cubeMap->texture)");
-		untyped __cpp__("else cubeMap->renderTarget->useColorAsTexture(koreUnit->unit)");
+		untyped __cpp__(
+			"if (cubeMap->texture != nullptr) Kore::Graphics4::setTexture(koreUnit->unit, cubeMap->texture);
+			else cubeMap->renderTarget->useColorAsTexture(koreUnit->unit)"
+		);
 	}
 	
 	public function setCubeMapDepth(unit: kha.graphics4.TextureUnit, cubeMap: kha.graphics4.CubeMap): Void {
@@ -260,6 +262,16 @@ class Graphics implements kha.graphics4.Graphics {
 		setTexture3DWrapNative(cast texunit, getTextureAddressing(uAddressing), getTextureAddressing(vAddressing), getTextureAddressing(wAddressing));
 		setTexture3DFiltersNative(cast texunit, getTextureFilter(minificationFilter), getTextureFilter(magnificationFilter), getTextureMipMapFilter(mipmapFilter));
 	}
+
+	public function setTextureCompareMode(texunit: kha.graphics4.TextureUnit, enabled: Bool) {
+		var koreUnit = cast(texunit, kha.kore.graphics4.TextureUnit);
+		untyped __cpp__("Kore::Graphics4::setTextureCompareMode(koreUnit->unit, enabled);");
+	}
+
+	public function setCubeMapCompareMode(texunit: kha.graphics4.TextureUnit, enabled: Bool) {
+		var koreUnit = cast(texunit, kha.kore.graphics4.TextureUnit);
+		untyped __cpp__("Kore::Graphics4::setCubeMapCompareMode(koreUnit->unit, enabled);");
+	}
 	
 	@:functionCode('
 		if (texture->texture != nullptr) Kore::Graphics4::setTexture(unit->unit, texture->texture);
@@ -317,6 +329,10 @@ class Graphics implements kha.graphics4.Graphics {
 	
 	public function setPipeline(pipe: PipelineState): Void {
 		pipe.set();
+	}
+
+	public function setStencilReferenceValue(value: Int): Void {
+
 	}
 	
 	public function setBool(location: kha.graphics4.ConstantLocation, value: Bool): Void {

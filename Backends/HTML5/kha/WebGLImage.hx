@@ -248,6 +248,8 @@ class WebGLImage extends Image {
 				SystemImpl.gl.texImage2D(GL.TEXTURE_2D, 0, SystemImpl.gl2 ? GL_R32F : GL.ALPHA, myWidth, myHeight, 0, SystemImpl.gl2 ? GL_RED : GL.ALPHA, GL.FLOAT, image);
 			case A16:
 				SystemImpl.gl.texImage2D(GL.TEXTURE_2D, 0, SystemImpl.gl2 ? GL_R16F : GL.ALPHA, myWidth, myHeight, 0, SystemImpl.gl2 ? GL_RED : GL.ALPHA, SystemImpl.halfFloat.HALF_FLOAT_OES, image);
+			case L8:
+				SystemImpl.gl.texImage2D(GL.TEXTURE_2D, 0, GL.LUMINANCE, myWidth, myHeight, 0, GL.LUMINANCE, GL.UNSIGNED_BYTE, image);
 			default:
 				SystemImpl.gl.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
 			}
@@ -311,8 +313,9 @@ class WebGLImage extends Image {
 	}
 
 	override public function setDepthStencilFrom(image: Image): Void {
+		depthTexture = cast(image, WebGLImage).depthTexture;
 		SystemImpl.gl.bindFramebuffer(GL.FRAMEBUFFER, frameBuffer);
-		SystemImpl.gl.framebufferTexture2D(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.TEXTURE_2D, cast(image, WebGLImage).depthTexture, 0);
+		SystemImpl.gl.framebufferTexture2D(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.TEXTURE_2D, depthTexture, 0);
 	}
 
 	private static function formatByteSize(format: TextureFormat): Int {

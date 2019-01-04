@@ -1,4 +1,4 @@
-package kha.network;
+package kha.netsync;
 
 import haxe.macro.Context;
 import haxe.macro.Expr.Field;
@@ -8,8 +8,8 @@ class ControllerBuilder {
 
 	macro static public function build(): Array<Field> {
 		var fields = Context.getBuildFields();
-		
-		#if (!kha_server && (kha_html5 || kha_debug_html5 || kha_kore))
+
+		#if (!kha_server && (kha_html5 || kha_kore))
 
 		{
 			var funcindex = 0;
@@ -95,9 +95,9 @@ class ControllerBuilder {
 					}
 					var original = f.expr;
 					expr = macro {
-						if (kha.network.Session.the() != null) {
+						if (kha.netsync.Session.the() != null) {
 							$expr;
-							kha.network.Session.the().sendControllerUpdate(_id(), bytes);
+							kha.netsync.Session.the().sendControllerUpdate(_id(), bytes);
 						}
 						$original;
 					};
@@ -111,7 +111,7 @@ class ControllerBuilder {
 		#end
 
 		// macros failing everywhere but in JavaScript?
-		#if (kha_server || kha_html5 || kha_debug_html5 || kha_kore)
+		#if (kha_server || kha_html5 || kha_kore)
 
 		var receive = macro @:mergeBlock {
 			var funcindex = bytes.getInt32(0);
