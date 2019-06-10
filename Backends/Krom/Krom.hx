@@ -49,6 +49,7 @@ extern class Krom {
 	static function createTextureFromBytes(data: haxe.io.BytesData, width: Int, height: Int, format: Int, readable: Bool): Dynamic;
 	static function createTextureFromBytes3D(data: haxe.io.BytesData, width: Int, height: Int, depth: Int, format: Int, readable: Bool): Dynamic;
 	static function createTextureFromEncodedBytes(data: haxe.io.BytesData, format: String, readable: Bool): Dynamic;
+	static function getTexturePixels(texture: Dynamic): haxe.io.BytesData;
 	static function getRenderTargetPixels(renderTarget: Dynamic, data: haxe.io.BytesData): Void;
 	static function lockTexture(texture: Dynamic, level: Int): js.html.ArrayBuffer;
 	static function unlockTexture(texture: Dynamic): Void;
@@ -74,7 +75,7 @@ extern class Krom {
 	static function loadImage(file: String, readable: Bool): Dynamic;
 	static function unloadImage(image: kha.Image): Void;
 	static function loadSound(file: String): Dynamic;
-	static function writeAudioBuffer(bufferValue: Float): Dynamic;
+	static function writeAudioBuffer(buffer: js.html.ArrayBuffer, samples: Int): Void;
 	static function loadBlob(file: String): js.html.ArrayBuffer;
 	
 	static function init(title: String, width: Int, height: Int, samplesPerPixel: Int, vSync: Bool, windowMode: Int, windowFeatures: Int, kromApi: Int): Void;
@@ -100,7 +101,6 @@ extern class Krom {
 	static function isMouseLocked(): Bool;
 	static function showMouse(show: Bool): Void;
 	static function setAudioCallback(callback: Int->Void): Void;
-	static function audioThread(lock: Bool): Void;
 	static function getTime(): Float;
 	static function windowWidth(id: Int): Int;
 	static function windowHeight(id: Int): Int;

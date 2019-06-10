@@ -120,13 +120,11 @@ class PipelineState extends PipelineStateBase {
 	}
 
 	public function compile(): Void {
-		var stencilReferenceValue = 0;
-		switch (this.stencilReferenceValue) {
-			case Static(value):
-				stencilReferenceValue = value;
-			default:
+		var stencilReferenceValue = switch (this.stencilReferenceValue) {
+			case Static(value): value;
+			default: 0;
 		}
-		setStates(cullMode, depthMode, stencilMode, stencilBothPass, stencilDepthFail, stencilFail,
+		setStates(cullMode, depthMode, stencilMode, stencilBothPass, stencilDepthFail, stencilFail, depthWrite,
 		stencilReferenceValue, getBlendFunc(blendSource), getBlendFunc(blendDestination), getBlendFunc(alphaBlendSource), getBlendFunc(alphaBlendDestination));
 		linkWithStructures2(
 			inputLayout.length > 0 ? inputLayout[0] : null,
@@ -198,32 +196,7 @@ class PipelineState extends PipelineStateBase {
 			break;
 		}
 
-		switch (depthMode) {
-		case 0:
-			pipeline->depthMode = Kore::Graphics4::ZCompareAlways;
-			break;
-		case 1:
-			pipeline->depthMode = Kore::Graphics4::ZCompareNever;
-			break;
-		case 2:
-			pipeline->depthMode = Kore::Graphics4::ZCompareEqual;
-			break;
-		case 3:
-			pipeline->depthMode = Kore::Graphics4::ZCompareNotEqual;
-			break;
-		case 4:
-			pipeline->depthMode = Kore::Graphics4::ZCompareLess;
-			break;
-		case 5:
-			pipeline->depthMode = Kore::Graphics4::ZCompareLessEqual;
-			break;
-		case 6:
-			pipeline->depthMode = Kore::Graphics4::ZCompareGreater;
-			break;
-		case 7:
-			pipeline->depthMode = Kore::Graphics4::ZCompareGreaterEqual;
-			break;
-		}
+		pipeline->depthMode = convertCompareMode(depthMode);
 		pipeline->depthWrite = depthWrite;
 
 		pipeline->stencilMode = convertCompareMode(stencilMode);
@@ -248,7 +221,7 @@ class PipelineState extends PipelineStateBase {
 
 		pipeline->conservativeRasterization = conservativeRasterization;
 	')
-	private function setStates(cullMode: Int, depthMode: Int, stencilMode: Int, stencilBothPass: Int, stencilDepthFail: Int, stencilFail: Int,
+	private function setStates(cullMode: Int, depthMode: Int, stencilMode: Int, stencilBothPass: Int, stencilDepthFail: Int, stencilFail: Int, depthWrite: Bool,
 	stencilReferenceValue: Int, blendSource: Int, blendDestination: Int, alphaBlendSource: Int, alphaBlendDestination: Int): Void {
 
 	}

@@ -6,7 +6,7 @@ import cpp.vm.Mutex;
 import haxe.ds.Vector;
 
 class Audio1 {
-	private static inline var channelCount: Int = 16;
+	private static inline var channelCount: Int = 32;
 	private static var soundChannels: Vector<AudioChannel>;
 	private static var streamChannels: Vector<StreamChannel>;
 
@@ -109,6 +109,11 @@ class Audio1 {
 		#if cpp
 		mutex.acquire();
 		#end
+		for (i in 0...channelCount) {
+			if (soundChannels[i] == channel) {
+				soundChannels[i] = null;
+			}
+		}
 		for (i in 0...channelCount) {
 			if (soundChannels[i] == null || soundChannels[i].finished || soundChannels[i] == channel) {
 				soundChannels[i] = channel;

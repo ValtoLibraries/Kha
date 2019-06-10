@@ -11,6 +11,7 @@
 #include <Kore/IO/FileReader.h>
 #include <Kore/Log.h>
 #include <Kore/Threads/Mutex.h>
+#include <Kore/Threads/Thread.h>
 #include <Kore/Math/Random.h>
 #if HXCPP_API_LEVEL >= 332
 #include <hxinc/kha/SystemImpl.h>
@@ -31,10 +32,6 @@
 #ifdef ANDROID
 	//#include <Kore/Vr/VrInterface.h>
 #endif
-
-extern "C" const char* hxRunLibrary();
-extern "C" void hxcpp_set_top_of_stack();
-void __hxcpp_register_current_thread();
 
 namespace {
 	using kha::SystemImpl_obj;
@@ -239,8 +236,11 @@ namespace {
 		if (!mixThreadregistered) {
 			HX_TOP_OF_STACK
 			mixThreadregistered = true;
+			threadSleep(100);
 		}
 #endif
+		//int addr = 0;
+		//Kore::log(Info, "mix address is %x", &addr);
 
 		::kha::audio2::Audio_obj::_callCallback(samples);
 
@@ -327,22 +327,39 @@ void post_kore_init() {
 
 void run_kore() {
 	Kore::log(Kore::Info, "Starting application");
+	Kore::threadsInit();
 	Kore::Audio2::audioCallback = mix;
 	Kore::Audio2::init();
+	::kha::audio2::Audio_obj::samplesPerSecond = Kore::Audio2::samplesPerSecond;
 	Kore::System::start();
 	Kore::log(Kore::Info, "Application stopped");
 #if !defined(KORE_XBOX_ONE) && !defined(KORE_TIZEN) && !defined(KORE_HTML5)
+	Kore::threadsQuit();
 	Kore::System::stop();
 #endif
 }
 
-int kore(int argc, char** argv) {
-	Kore::log(Kore::Info, "Initializing Haxe libraries");
-	hxcpp_set_top_of_stack();
-	const char* err = hxRunLibrary();
-	if (err) {
-		Kore::log(Kore::Error, "Error %s", err);
-		return 1;
+extern "C" void __hxcpp_main();
+extern int _hxcpp_argc;
+extern char **_hxcpp_argv;
+
+int kickstart(int argc, char **argv) {
+	_hxcpp_argc = argc;
+	_hxcpp_argv = argv;
+	HX_TOP_OF_STACK
+	hx::Boot();
+#ifdef NDEBUG
+	try {
+#endif
+		__boot_all();
+		__hxcpp_main();
+#ifdef NDEBUG
 	}
+	catch (Dynamic e) {
+		__hx_dump_stack();
+		Kore::log(Kore::Error, "Error %s", e == null() ? "null" : e->toString().__CStr());
+		return -1;
+	}
+#endif
 	return 0;
 }

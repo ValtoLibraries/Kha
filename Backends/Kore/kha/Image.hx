@@ -70,7 +70,7 @@ class Image implements Canvas implements Resource {
 		return image;
 	}
 
-	@:functionCode('texture = new Kore::Graphics4::Texture(bytes.GetPtr()->GetBase(), width, height, format, readable);')
+	@:functionCode('texture = new Kore::Graphics4::Texture(bytes.GetPtr()->GetBase(), width, height, (Kore::Graphics1::Image::Format)format, readable);')
 	private function initFromBytes(bytes: BytesData, width: Int, height: Int, format: Int): Void {
 		
 	}
@@ -83,7 +83,7 @@ class Image implements Canvas implements Resource {
 		return image;
 	}
 
-	@:functionCode('texture = new Kore::Graphics4::Texture(bytes.GetPtr()->GetBase(), width, height, depth, format, readable);')
+	@:functionCode('texture = new Kore::Graphics4::Texture(bytes.GetPtr()->GetBase(), width, height, depth, (Kore::Graphics1::Image::Format)format, readable);')
 	private function initFromBytes3D(bytes: BytesData, width: Int, height: Int, depth: Int, format: Int): Void {
 		
 	}
@@ -103,6 +103,17 @@ class Image implements Canvas implements Resource {
 
 	private function new(readable: Bool) {
 		this.readable = readable;
+		nullify();
+		cpp.vm.Gc.setFinalizer(this, cpp.Function.fromStaticFunction(finalize));
+	}
+
+	@:functionCode("texture = nullptr; renderTarget = nullptr; textureArray = nullptr; textureArrayTextures = nullptr;")
+	function nullify() {
+
+	}
+
+	@:void static function finalize(image: Image): Void {
+		image.unload();
 	}
 
 	private static function getRenderTargetFormat(format: TextureFormat): Int {
